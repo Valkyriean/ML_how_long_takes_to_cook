@@ -1,5 +1,8 @@
 import numpy as np
 import pandas as pd
+import scipy
+import pickle
+
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder
@@ -10,6 +13,7 @@ from sklearn.feature_selection import mutual_info_classif
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
+from sklearn import svm
 
 
 train = pd.read_csv("data/recipe_train.csv")
@@ -20,13 +24,18 @@ steps = pd.read_csv(r"data/recipe_text_features_doc2vec50/train_steps_doc2vec50.
 real_name = pd.read_csv(r"data/recipe_text_features_doc2vec50/test_name_doc2vec50.csv", index_col = False, delimiter = ',', header=None)
 real_ingr = pd.read_csv(r"data/recipe_text_features_doc2vec50/test_ingr_doc2vec50.csv", index_col = False, delimiter = ',', header=None)
 real_steps = pd.read_csv(r"data/recipe_text_features_doc2vec50/test_steps_doc2vec50.csv", index_col = False, delimiter = ',', header=None)
+vocab = pickle.load(open("data/recipe_text_features_countvec/train_steps_countvectorizer.pkl", "rb"))
+npz = scipy.sparse.load_npz('data/recipe_text_features_countvec/train_steps_vec.npz')
+t_npz = scipy.sparse.load_npz('data/recipe_text_features_countvec/test_steps_vec.npz')
 
+vocab_dict = vocab.vocabulary_
 
-X = train.iloc[:, 1:3]
+# X = train.iloc[:, 1:3]
 y = train.iloc[:,-1]
-X = pd.concat([X,steps,name,ingr], axis = 1)
-real_x = test.iloc[:,1:3]
-real_x = pd.concat([real_x, real_steps], axis=1)
+# X = pd.concat([X,steps,name,ingr], axis = 1)
+# real_x = test.iloc[:,1:3]
+# real_x = pd.concat([real_x, real_steps], axis=1)
+X =npz.toarray()
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=88)
 
 
@@ -39,11 +48,13 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random
 # X_test_mi = mi.transform(X_test)
 
 # lgr =  MLPClassifier(random_state=1, max_iter=300)
-lgr = LogisticRegression()
-lgr.fit(X_train,y_train)
-print("lgr Accuracy:",lgr.score(X_test,y_test))
+# lgr = LogisticRegression()
+# lgr = KNeighborsClassifier()
+# svc = svm.SVC(kernel='poly',degree=3)
+svc.fit(X_train,y_train)
+print("lgr Accuracy:",svc.score(X_test,y_test))
 
-# real_y = lgr.predict(real_x)
+# real_y = lgr.predict(t_npz)
 # index = range(1,len(real_y)+1)
 # out = pd.DataFrame(data = real_y, index= index)
 # out.to_csv('out.csv', header = ['duration_label'], index = True, index_label='id')
