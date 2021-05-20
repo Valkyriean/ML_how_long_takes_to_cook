@@ -14,6 +14,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn import svm
+from sklearn.feature_extraction.text import TfidfTransformer
 
 
 train = pd.read_csv("data/recipe_train.csv")
@@ -27,17 +28,16 @@ real_steps = pd.read_csv(r"data/recipe_text_features_doc2vec50/test_steps_doc2ve
 vocab = pickle.load(open("data/recipe_text_features_countvec/train_steps_countvectorizer.pkl", "rb"))
 npz = scipy.sparse.load_npz('data/recipe_text_features_countvec/train_steps_vec.npz')
 t_npz = scipy.sparse.load_npz('data/recipe_text_features_countvec/test_steps_vec.npz')
-
 vocab_dict = vocab.vocabulary_
-
-# X = train.iloc[:, 1:3]
+# X = train.iloc[:, 3:4]
 y = train.iloc[:,-1]
 # X = pd.concat([X,steps,name,ingr], axis = 1)
 # real_x = test.iloc[:,1:3]
 # real_x = pd.concat([real_x, real_steps], axis=1)
-X =npz.toarray()
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=88)
-
+tfidf_transformer  = TfidfTransformer()
+X = tfidf_transformer.fit_transform(npz)
+# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=88)
+real_x = tfidf_transformer.fit_transform(t_npz)
 
 # x2 = SelectKBest(chi2, k=5)
 # X_train_x2 = x2.fit_transform(X_train,y_train)
@@ -47,32 +47,15 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random
 # X_train_mi = mi.fit_transform(X_train,y_train)
 # X_test_mi = mi.transform(X_test)
 
-# lgr =  MLPClassifier(random_state=1, max_iter=300)
 # lgr = LogisticRegression()
-# lgr = KNeighborsClassifier()
-# svc = svm.SVC(kernel='poly',degree=3)
-svc.fit(X_train,y_train)
-print("lgr Accuracy:",svc.score(X_test,y_test))
+# lgr.fit(X,y)
 
-# real_y = lgr.predict(t_npz)
-# index = range(1,len(real_y)+1)
-# out = pd.DataFrame(data = real_y, index= index)
-# out.to_csv('out.csv', header = ['duration_label'], index = True, index_label='id')
+svc = svm.SVC()
+svc.fit(X,y)
 
+# print("lgr Accuracy:",lgr.score(X_test,y_test))
 
-
-# gnb = GaussianNB()
-# mnb = MultinomialNB()
-# bnb = BernoulliNB()
-
-# gnb.fit(X_train, y_train)
-# acc = gnb.score(X_test, y_test)
-# print("GNB score %f " %acc)
-    
-# mnb.fit(X_train, y_train)
-# acc = mnb.score(X_test, y_test)
-# print("MNB score %f " %acc)
-    
-# bnb.fit(X_train, y_train)
-# acc = bnb.score(X_test, y_test)
-# print("BNB score %f " %acc)
+real_y = svc.predict(real_x)
+index = range(1,len(real_y)+1)
+out = pd.DataFrame(data = real_y, index= index)
+out.to_csv('out.csv', header = ['duration_label'], index = True, index_label='id')
