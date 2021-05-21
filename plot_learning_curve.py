@@ -145,7 +145,7 @@ def plot_learning_curve(estimator, title, X, y, axes=None, ylim=None, cv=None,
     return plt
 
 
-fig, axes = plt.subplots(3, 2, figsize=(10, 15))
+fig, axes = plt.subplots(3, 1, figsize=(10, 15))
 
 # X, y = load_digits(return_X_y=True)
 
@@ -159,7 +159,7 @@ X = tfidf_transformer.fit_transform(npz)
 title = "Learning Curves (SVC)"
 # Cross validation with 100 iterations to get smoother mean test and train
 # score curves, each time with 20% data randomly selected as a validation set.
-cv = ShuffleSplit(n_splits=100, test_size=0.2, random_state=0)
+cv = ShuffleSplit(n_splits=10, test_size=0.2, random_state=0)
 
 estimator = svm.SVC()
 plot_learning_curve(estimator, title, X, y, axes=axes[:, 0], ylim=(0.7, 1.01),
