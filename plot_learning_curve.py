@@ -145,12 +145,12 @@ def plot_learning_curve(estimator, title, X, y, axes=None, ylim=None, cv=None,
     return plt
 
 
-fig, axes = plt.subplots(3, 1, figsize=(10, 15))
+fig, axes = plt.subplots(3, 2, figsize=(10, 15))
 
 # X, y = load_digits(return_X_y=True)
 
-npz = scipy.sparse.load_npz('data/recipe_text_features_countvec/train_steps_vec.npz')
-train = pd.read_csv("data/recipe_train.csv")
+npz = scipy.sparse.load_npz('train_steps_vec.npz')
+train = pd.read_csv("recipe_train.csv")
 y = train.iloc[:,-1]
 tfidf_transformer  = TfidfTransformer()
 X = tfidf_transformer.fit_transform(npz)
@@ -159,7 +159,7 @@ X = tfidf_transformer.fit_transform(npz)
 title = "Learning Curves (SVC)"
 # Cross validation with 100 iterations to get smoother mean test and train
 # score curves, each time with 20% data randomly selected as a validation set.
-cv = ShuffleSplit(n_splits=10, test_size=0.2, random_state=0)
+cv = ShuffleSplit(n_splits=100, test_size=0.2, random_state=88)
 
 estimator = svm.SVC()
 plot_learning_curve(estimator, title, X, y, axes=axes[:, 0], ylim=(0.7, 1.01),

@@ -39,9 +39,6 @@ X = tfidf_transformer.fit_transform(npz)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=88)
 # real_x = tfidf_transformer.fit_transform(t_npz)
 
-# x2 = SelectKBest(chi2, k=5)
-# X_train_x2 = x2.fit_transform(X_train,y_train)
-# X_test_x2 = x2.transform(X_test)
 
 # mi = SelectKBest(score_func=mutual_info_classif, k=10)
 # X_train_mi = mi.fit_transform(X_train,y_train)
@@ -53,10 +50,10 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random
 svc = svm.SVC()
 svc.fit(X_train,y_train)
 
-# print("lgr Accuracy:",svc.score(X_test,y_test))
+# print("SVC Accuracy:",svc.score(X_test,y_test))
 
-y = svc.predict(X_test)
-# real_y = svc.predict(real_x)
+
+# real_y = svc.predict(t_npz)
 # index = range(1,len(real_y)+1)
-out = pd.DataFrame(data = y)
-out.to_csv('out.csv')
+# out = pd.DataFrame(data = real_y, index= index)
+# out.to_csv('out.csv', header = ['duration_label'], index = True, index_label='id')
